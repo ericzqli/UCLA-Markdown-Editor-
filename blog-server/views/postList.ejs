@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Post List</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <table>
+        <tbody>
+            <tr>
+                <th>username</th>
+                <th>postid</th>
+                <th>created</th>
+                <th>modified</th>
+            </tr>
+            <% var j = 0;%>
+            <% for(var i = start - 1; i < list.length; i++) { %>
+                <tr>
+                    <th><%= list[i].username %></th>
+                    <th><%= list[i].postid %></th>
+                    <th><%= list[i].created %></th>
+                    <th><%= list[i].modified %></th>
+                </tr>
+                <% j++; %>
+                <% if(j == 5) {%>
+                    <% break;%>
+                <% } %>
+            <% } %>
+        </tbody>
+    </table>
+    <!-- <form id='nextButton' action='blog' method='GET'>
+        <input type='hidden' name='username' value=<%= username %> >
+        <input type='hidden' name='start' value=<%= start %> >
+        <% if(list.length - start > 5) {%>
+            <button type='submit' >Next</button>
+
+        <% } %>
+    </form> -->
+    <% var curNum = parseInt(start)%>
+    <% curNum += 5 %>
+    <% var hrefAddress = "http://localhost:3000/blog/"%>
+    <!-- <div><%= curNum%></div> -->
+    <% if(curNum <= list.length) {%>
+        <a href=<%= hrefAddress+username+'?start='+curNum %> > Next</a>  
+    <% } %>
+    
+ 
+    
+  </body>
+</html>
