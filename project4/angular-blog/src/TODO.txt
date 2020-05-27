@@ -1,0 +1,2 @@
+1. ngInit with click on list item
+2. list refreshes when delete in the edit panel

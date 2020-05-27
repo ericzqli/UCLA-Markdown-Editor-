@@ -1,0 +1,15 @@
+<button (click)="newPost()" [routerLink]="['/edit/'+ nextPostid ]">New Post</button>
+<ul>
+    <li *ngFor="let post of postList">
+
+        <a [routerLink]="['/edit/'+post.postid]" (click)="setDraft(post)">
+     
+                {{ post.created | date: 'short' }} &nbsp;
+                {{ post.title }}
+       
+            
+        </a>
+        
+    </li>
+</ul>
+

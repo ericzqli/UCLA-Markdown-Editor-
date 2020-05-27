@@ -43,9 +43,31 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use());
 
+// var login = require('./routes/blog');
+// app.use('/editor', login)
+app.get('/editor',(req, res) => {
+  console.log("I came here");
+  if('jwt' in req.cookies) {
+    res.sendFile(__dirname+'/public/editor/index.html');    
+  } else {
+    res.redirect('/blog/login');
+  }
+  
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
 //TODO: handle login
+
+// app.get('/editor/', function(req, res, next) {
+//   console.log("check editor");
+//   if('jwt' in req.cookies) {
+//     res.redirect('/blog/login');
+//   } else {
+//     res.render('editor');
+//   }
+// });
 
 
 
@@ -92,7 +114,7 @@ app.post('/blog/login/:redirect?', function(req, res, next) {
             var reAddress = req.body.redirect;
             res.redirect(200, reAddress);
           } else {
-            res.redirect(200, '/status/loginsuc/');
+            res.redirect(200, '/editor/');
           }
         } else {  
           res.redirect(401, '/blog/login/');
@@ -153,7 +175,7 @@ app.get('/api/:username/:postid', function(req, res, next) {
     {fields:{_id: 0, username: 0}}).toArray(
     (err, result) => {
       if(result.length === 0) {
-        res.status(404);
+        res.status(404).send("POST NOT FOUND");
         return;
       } else {
         res.status(200).json(result);
@@ -164,7 +186,7 @@ app.get('/api/:username/:postid', function(req, res, next) {
   );
 });
 app.post('/api/:username/:postid', (req, res, next) => {
-  if(!('jwt' in req.cookies) && !(jwtModule.verify(req.cookies.jwt, req.params.username))) {
+  if(!('jwt' in req.cookies) || !(jwtModule.verify(req.cookies.jwt, req.params.username))) {
     res.status(401).send("Unauthorized");
     return;
   }
@@ -173,13 +195,13 @@ app.post('/api/:username/:postid', (req, res, next) => {
     res.status(400).send("Bad Request");
   }
   // console.log(req.body.body);
-  db.collection('Posts').find({'username':req.params.username, 'postid': req.params.postid}).toArray(
+  db.collection('Posts').find({'username':req.params.username, 'postid': parseInt(req.params.postid)}).toArray(
     (err, result) => {
       if(result.length != 0) {
         res.status(400).send("Bad Request");
         return;
       } else {
-        var newPost = {'username': req.params.username, 'postid': req.params.postid,
+        var newPost = {'username': req.params.username, 'postid': parseInt(req.params.postid),
         'created': Date.now(), 'modified': Date.now(), 'title': req.body.title,
         'body': req.body.body};
         db.collection('Posts').insertOne(newPost, (err, result) => {
@@ -206,21 +228,23 @@ app.put('/api/:username/:postid', (req, res, next) => {
     return;
   }
   // console.log(req.body.body);
-  db.collection('Posts').find({'username':req.params.username, 'postid': req.params.postid}).toArray(
+  db.collection('Posts').find({'username':req.params.username, 'postid': parseInt(req.params.postid)}).toArray(
     (err, result) => {
+      // console.log(result);
       if(result.length === 0) {
         res.status(400).send("Bad Request");
         return;
         // next();
       } else {
-        var newValue = { $set: {title: req.body.title, body: req.body.body,
-          modified: Date.now()} };
-        var query = {username: req.params.username, postid: req.params.postid};
+        var newValue = { $set: {'title': req.body.title, 'body': req.body.body,
+          'modified': Date.now()} };
+        var query = {'username': req.params.username, 'postid': parseInt(req.params.postid)};
         db.collection('Posts').updateOne(query, newValue, (err, result) => {
           if(err) {
             next();
           } else {
-            res.status(201);
+            res.status(201).send("PUT SUCCESS");
+            return;
           }
         });
       }
@@ -233,20 +257,15 @@ app.delete('/api/:username/:postid', (req, res, next) => {
     res.status(401).send("Unauthorized");
     return;
   }
-  var myquery = {username: req.params.username, postid: req.params.postid};
+  var myquery = {username: req.params.username, postid: parseInt(req.params.postid)};
   db.collection('Posts').deleteOne(myquery, (err, result) => {
     if(err) {
       next();
     } 
-    res.status(204).send("No content");
+    res.status(204).send("DELETE SUCCUESS");
+    return;
   });
 });
-
-
-
-
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

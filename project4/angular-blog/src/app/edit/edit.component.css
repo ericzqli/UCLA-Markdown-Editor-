@@ -1,0 +1,16 @@
+#body{
+    width: 200px;
+    height: 300px;
+}
+
+#title {
+    width:200px;
+}
+
+input[type=text]:focus {
+    border: 3px solid #555;
+}
+
+button {
+    margin: 4px;
+}

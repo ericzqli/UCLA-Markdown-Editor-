@@ -1,0 +1,26 @@
+<div *ngIf="post">
+    <div >
+        Title:
+    </div>
+    <div>
+        <input id="title" name="title" 
+            placeholder="title" [(ngModel)]="post.title">
+    </div>
+    <div>
+        Body:
+    </div>
+    <div>
+        <textarea id="body" type="text" [(ngModel)]="post.body"></textarea>
+    </div>
+    
+    <div>
+        Last Modified: {{ post.modified | date: 'short'}}
+    </div>
+    <div id="buttons">
+        <button (click)="deletePost()" [routerLink]="['/']">delete</button>
+        <button (click)="savePost()">save</button>
+        <button [routerLink]="['/preview/' + post.postid]" (click)="previewPost()">preview</button>
+    </div>
+</div>
+
+    
